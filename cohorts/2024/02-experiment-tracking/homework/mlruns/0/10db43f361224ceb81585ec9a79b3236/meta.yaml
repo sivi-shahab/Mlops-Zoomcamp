@@ -1,0 +1,15 @@
+artifact_uri: file:///root/Mlops-Zoomcamp/cohorts/2024/02-experiment-tracking/homework/mlruns/0/10db43f361224ceb81585ec9a79b3236/artifacts
+end_time: 1716825822639
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 10db43f361224ceb81585ec9a79b3236
+run_name: charming-cow-295
+run_uuid: 10db43f361224ceb81585ec9a79b3236
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1716825810776
+status: 3
+tags: []
+user_id: root

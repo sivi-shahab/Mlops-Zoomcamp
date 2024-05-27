@@ -2,6 +2,7 @@ import os
 import pickle
 import click
 import mlflow
+import mlflow.sklearn
 
 from mlflow.entities import ViewType
 from mlflow.tracking import MlflowClient
@@ -40,6 +41,8 @@ def train_and_log_model(data_path, params):
         test_rmse = mean_squared_error(y_test, rf.predict(X_test), squared=False)
         mlflow.log_metric("test_rmse", test_rmse)
 
+    return test_rmse, mlflow.active_run().info.run_id
+
 
 @click.command()
 @click.option(
@@ -65,15 +68,24 @@ def run_register_model(data_path: str, top_n: int):
         max_results=top_n,
         order_by=["metrics.rmse ASC"]
     )
+
+    best_test_rmse = float("inf")
+    best_run_id = None
+
     for run in runs:
-        train_and_log_model(data_path=data_path, params=run.data.params)
+        test_rmse, run_id = train_and_log_model(data_path=data_path, params=run.data.params)
+        if test_rmse < best_test_rmse:
+            best_test_rmse = test_rmse
+            best_run_id = run_id
 
     # Select the model with the lowest test RMSE
-    experiment = client.get_experiment_by_name(EXPERIMENT_NAME)
-    # best_run = client.search_runs( ...  )[0]
+    if best_run_id:
+        model_uri = f"runs:/{best_run_id}/model"
+        model_name = "random-forest-regressor"
 
-    # Register the best model
-    # mlflow.register_model( ... )
+        # Register the best model
+        mlflow.register_model(model_uri=model_uri, name=model_name)
+        print(f"Registered model with URI: {model_uri} as {model_name}")
 
 
 if __name__ == '__main__':
